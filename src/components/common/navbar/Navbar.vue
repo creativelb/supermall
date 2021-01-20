@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar" :style="{ backgroudColor: bgColor }">
+  <div class="navbar" :style="{ backgroundColor: bgColor,height: `${height}px`,zIndex:zindex }">
     <div class="left">
       <slot name="left"></slot>
     </div>
@@ -20,6 +20,14 @@ export default {
       type: String,
       defalut: "#f042b0",
     },
+    height:{
+      type: String,
+      default: 44
+    },
+    zindex:{
+      type:Number,
+      default: 9
+    }
   },
 };
 </script>
@@ -33,6 +41,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  text-align: center;
 }
 .left{
   width: 60px;
