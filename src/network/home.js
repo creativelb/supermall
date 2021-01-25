@@ -7,3 +7,15 @@ export function getHomeData() {
   })
 
 }
+
+export function getHomeGoods(type,page){
+
+  return request1({
+    url: '/home/data',
+    method: 'get',
+    params:{
+      type,
+      page
+    }
+  })
+}

@@ -92,6 +92,5 @@ export default {
 }
 .sticky {
   position: sticky;
-  top: 44;
 }
 </style>
