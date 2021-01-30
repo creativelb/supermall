@@ -1,10 +1,7 @@
 <template>
-  <div
-    class="tab-control"
-    :class="{ sticky: sticky }"
-    :style="{ top: sticky ? topDistance + 'px' : 0 }"
-    @click.prevent
-  >
+  <!-- :class="{ sticky: sticky }"
+    :style="{ top: sticky ? topDistance + 'px' : 0 }" -->
+  <div class="tab-control" @click.prevent>
     <div
       class="tab-item"
       v-for="(item, index) in data"
@@ -70,7 +67,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .tab-control {
   display: flex;
   align-items: center;
@@ -90,7 +87,7 @@ export default {
   color: #f042b0;
   border-bottom: 2px solid #f042b0;
 }
-.sticky {
+/* .sticky {
   position: sticky;
-}
+} */
 </style>

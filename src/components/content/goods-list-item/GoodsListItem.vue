@@ -1,7 +1,7 @@
 <template>
-  <div class="goods-list-item">
+  <div class="goods-list-item" @click="itemClick">
     <div class="img-container">
-      <img :src="data.showLarge.img" />
+      <img :src="data.showLarge.img" @load="imgUpload" />
     </div>
     <div class="text">
       <p class="title">{{ data.title }}</p>
@@ -20,6 +20,15 @@ export default {
     data: {
       type: Object,
       default: () => {},
+    },
+  },
+  methods: {
+    imgUpload() {
+      console.log("upload");
+      this.$bus.$emit("goodsListItemUpload");
+    },
+    itemClick() {
+      this.$router.push("/detail/" + this.data.iid);
     },
   },
 };
@@ -45,24 +54,24 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.info{
+.info {
   text-align: center;
 }
-.price{
+.price {
   margin-right: 30px;
   color: #f042b0;
 }
-.favor{
+.favor {
   position: relative;
 }
-.favor::before{
+.favor::before {
   content: "";
   position: absolute;
   left: -15px;
   top: 1px;
   width: 15px;
   height: 15px;
-  background: url("~@/assets/img/home/shoucang.svg") no-repeat ;
+  background: url("~@/assets/img/home/shoucang.svg") no-repeat;
   background-size: contain;
 }
 </style>

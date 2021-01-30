@@ -5,6 +5,14 @@
         <span class="nav-center">首页</span>
       </template>
     </navbar>
+    <tab-control
+      :data="tabControlName"
+      :currentIndex="tabControlIndex"
+      topDistance="44"
+      @tabItemClick="tabItemClick"
+      class="tab-control-sticky"
+      v-show="isTabControlFixed"
+    ></tab-control>
     <scroll
       class="content"
       :height="sHeight"
@@ -14,7 +22,7 @@
       @pullingUp="pullingUp"
       ref="scroll"
     >
-      <slide :banners="banner"></slide>
+      <slide :banners="banner" @swiperImgUpload="swiperImgUpload"></slide>
       <recommend-view :recommends="recommend"></recommend-view>
       <feature-view :imageUrl="featureImageUrl"></feature-view>
       <tab-control
@@ -22,6 +30,7 @@
         :currentIndex="tabControlIndex"
         topDistance="44"
         @tabItemClick="tabItemClick"
+        ref="tabControl"
       ></tab-control>
       <div class="goods-list-container">
         <goods-list :list="goodsList || goods.sell.list"></goods-list>
@@ -47,6 +56,7 @@ import BackTop from "@/components/content/back-top/BackTop";
 import RecommendView from "@/views/home/home-components/RecommendView";
 import FeatureView from "@/views/home/home-components/FeatureView";
 
+import { debounce } from "@/common/utils.js";
 import TabControlItem from "@/common/TabControlItem";
 import { getHomeData, getHomeGoods } from "@/network/home.js";
 
@@ -71,6 +81,9 @@ export default {
       },
       sHeight: 0,
       backTopHidden: true,
+      topOffset: 0, //tab-contrl 粘性布局滚动距离
+      isTabControlFixed: false, //是否吸顶
+      scrollY: 0, // 离开时的滚动距离
     };
   },
   methods: {
@@ -86,6 +99,8 @@ export default {
       getHomeGoods(type, page).then((res) => {
         this.goods[type].list.push(...res.data.data.list);
         console.log(this.goods);
+        // 处理完成调用finishPullUp
+        this.$refs.scroll.finishPullUp();
       });
     },
     tabItemClick(index) {
@@ -108,19 +123,31 @@ export default {
       } else {
         this.backTopHidden = true;
       }
+      // 设置吸顶效果
+      this.isTabControlFixed =
+        Math.abs(position.y) > this.topOffset ? true : false;
     },
     // 上拉加载
     pullingUp() {
       console.log("daidile");
       // 请求数据
-      let type = this.tabControlIndex == 0 ? 'sell' : this.tabControlIndex==1 ? 'pop' : 'new';
-      this.goods[type].page = this.goods[type].page+1
+      let type =
+        this.tabControlIndex == 0
+          ? "sell"
+          : this.tabControlIndex == 1
+          ? "pop"
+          : "new";
+      this.goods[type].page = this.goods[type].page + 1;
       let page = this.goods[type].page;
-      this._getHomeGoods(type,page);
+      this._getHomeGoods(type, page);
       // dom发生改变要refresh
-      this.$refs.scroll.refresh();
-      // 处理完成调用finishPullUp
-      this.$refs.scroll.finishPullUp();
+      // this.$refs.scroll.refresh();
+    },
+    // 轮播图图片加载完成
+    swiperImgUpload() {
+      // 计算tab-control距离顶部距离 设置成粘性布局效果
+      console.log(this.$refs.tabControl.$el.offsetTop);
+      this.topOffset = this.$refs.tabControl.$el.offsetTop + 44;
     },
   },
   created() {
@@ -131,6 +158,21 @@ export default {
   },
   mounted() {
     this.sHeight = window.innerHeight - 44 - 49;
+    // 防抖
+    let refresh = debounce(this.$refs.scroll.refresh, 500);
+    // 事件总线
+    this.$bus.$on("goodsListItemUpload", () => {
+      // this.$refs.scroll.refresh();
+      refresh();
+    });
+  },
+  // 切换路由再回来还在原来地滚动位置
+  activated() {
+    this.$refs.scroll.scrollTo(0, this.scrollY,0);
+    this.$refs.scroll.refresh();
+  },
+  deactivated() {
+    this.scrollY = this.$refs.scroll.getScrollY();
   },
   computed: {
     tabControlName() {
@@ -155,7 +197,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .home {
   height: 100vh;
   overflow: hidden;
@@ -170,5 +212,12 @@ export default {
 .content {
   overflow: hidden;
   margin-top: 44px;
+}
+.tab-control-sticky {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  z-index: 9;
 }
 </style>

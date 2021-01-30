@@ -22,7 +22,7 @@ export default {
     },
     height:{
       type: String,
-      default: 44
+      default: '44'
     },
     zindex:{
       type:Number,

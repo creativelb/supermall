@@ -3,7 +3,7 @@
     <div class="swiper-wrapper">
       <div class="swiper-slide" v-for="(item, index) in banners" :key="index">
         <a :href="item.link">
-          <img :src="item.image" class="swiper-image" />
+          <img :src="item.image" class="swiper-image" @load="imgUpload" :style="{height: height + 'px'}"/>
         </a>
       </div>
     </div>
@@ -32,6 +32,10 @@ export default {
       type: Number,
       default: 1000,
     },
+    height:{
+      type: String,
+      default: '200'
+    }
   },
   mounted() {
     setTimeout(() => {
@@ -47,11 +51,18 @@ export default {
       });
     }, 50);
   },
+  methods:{
+    imgUpload(){
+      this.$emit('swiperImgUpload');
+    }
+  }
 };
 </script>
 
 <style>
 .swiper-image {
   width: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 </style>
