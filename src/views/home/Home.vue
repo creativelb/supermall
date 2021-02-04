@@ -57,11 +57,13 @@ import RecommendView from "@/views/home/home-components/RecommendView";
 import FeatureView from "@/views/home/home-components/FeatureView";
 
 import { debounce } from "@/common/utils.js";
+import { goodsListItemUploadMixin, backTopMixin } from "@/common/mixin.js";
 import TabControlItem from "@/common/TabControlItem";
 import { getHomeData, getHomeGoods } from "@/network/home.js";
 
 export default {
   name: "Home",
+  mixins: [goodsListItemUploadMixin, backTopMixin],
   data() {
     return {
       banner: [],
@@ -80,10 +82,11 @@ export default {
         new: new TabControlItem(1, []),
       },
       sHeight: 0,
-      backTopHidden: true,
+      // backTopHidden: true, 抽取到mixin
       topOffset: 0, //tab-contrl 粘性布局滚动距离
       isTabControlFixed: false, //是否吸顶
       scrollY: 0, // 离开时的滚动距离
+      // goodsListItemUploadHandler: null, //图片加载完成的回调事件  (抽取到mixin中)
     };
   },
   methods: {
@@ -112,10 +115,10 @@ export default {
       if (index == 2) list = this.goods.new.list;
       this.goodsList = list;
     },
-    // 回到顶部被点击
-    backTop() {
-      this.$refs.scroll.scrollTo(0, 0);
-    },
+    // 回到顶部被点击  (抽取到mixin)
+    // backTop() {
+    //   this.$refs.scroll.scrollTo(0, 0);
+    // },
     // scroll滚动时
     scroll(position) {
       if (Math.abs(position.y) > 1000) {
@@ -158,21 +161,28 @@ export default {
   },
   mounted() {
     this.sHeight = window.innerHeight - 44 - 49;
+    /* 下面注释内容  监听事件总线 图片加载就refresh的内容 全部抽取到mixin中*/
     // 防抖
-    let refresh = debounce(this.$refs.scroll.refresh, 500);
-    // 事件总线
-    this.$bus.$on("goodsListItemUpload", () => {
-      // this.$refs.scroll.refresh();
-      refresh();
-    });
+    // let refresh = debounce(this.$refs.scroll.refresh, 500);
+    // // 事件总线
+    // this.goodsListItemUploadHandler = () => {
+    //   // this.$refs.scroll.refresh();
+    //   refresh();
+    // };
+    // this.$bus.$on("goodsListItemUpload", this.goodsListItemUploadHandler);
   },
   // 切换路由再回来还在原来地滚动位置
   activated() {
-    this.$refs.scroll.scrollTo(0, this.scrollY,0);
+    this.$refs.scroll.scrollTo(0, this.scrollY, 0);
     this.$refs.scroll.refresh();
+
+    // home激活时继续监听图片加载完成
+    this.$bus.$on("goodsListItemUpload", this.goodsListItemUploadHandler);
   },
   deactivated() {
     this.scrollY = this.$refs.scroll.getScrollY();
+    // 离开时不再监听
+    this.$bus.$off("goodsListItemUpload", this.goodsListItemUploadHandler);
   },
   computed: {
     tabControlName() {
@@ -192,7 +202,7 @@ export default {
     GoodsListItem,
     GoodsList,
     Scroll,
-    BackTop,
+    // BackTop, mixin
   },
 };
 </script>

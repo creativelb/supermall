@@ -8,6 +8,9 @@ module.exports = {
         'network': '@/network',
         'views': '@/views',
       }
-    }
+    },
+  },
+  devServer: {
+    disableHostCheck: true,   // That solved it
   }
 }

@@ -11,6 +11,17 @@ export function getDetail(iid) {
   return request1(config);
 }
 
+export function getRecommend(iid) {
+  let config = {
+    url: '/recommend',
+    method: 'get',
+    params: {
+      iid
+    }
+  }
+  return request1(config);
+}
+
 //整合一下详情组件里的数据
 // 店铺商品信息对象
 export class Goods {
@@ -44,5 +55,31 @@ export class ParaMeter {
     this.image = info.images ? info.images[0] : '';
     this.infos = info.set;
     this.sizes = rule.tables;
+  }
+}
+
+export class Comment {
+  constructor(comment) {
+    this.content = comment.content;
+    this.images = comment.images;
+    this.isAnonymous = comment.isAnonymous;
+    this.isEmpty = comment.isEmpty;
+    this.level = comment.level;
+    this.rateId = comment.rateId;
+    this.style = comment.style;
+    this.created = comment.created;
+    this.user = comment.user
+  }
+}
+
+export class RecommendItem {
+  constructor(recommend) {
+    this.iid = recommend.item_id;
+    this.title = recommend.title;
+    this.price = recommend.discountPrice;
+    this.cfav = recommend.cfav;
+    this.showLarge = {
+      img: recommend.image
+    }
   }
 }

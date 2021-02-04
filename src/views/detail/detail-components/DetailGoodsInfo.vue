@@ -39,10 +39,11 @@ export default {
   },
   methods: {
     imgLoad() {
+      this.$emit("imgLoad");
       //类似于防抖.判断加载的数据长度进行刷新
-      if (++this.imgIndex === this.imglength) {
-        this.$emit("imgLoad");
-      }
+      // if (++this.imgIndex === this.imglength) {
+      //   this.$emit("imgLoad");
+      // }
     },
   },
 };
